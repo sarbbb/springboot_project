@@ -28,7 +28,5 @@ public class ProductDaoImpl implements ProductDao {
         }else{
             return null;
         }
-
-
     }
 }

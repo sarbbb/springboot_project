@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+</head>
+<body>
+    <h1>查詢商品</h1>
+    <label for="productId">商品ID：</label>
+    <input type="text" id="productId" placeholder="請輸入商品ID"/>
+    <button onclick="fetchProductDetails()">查詢</button>
+
+    <h2>商品詳情</h2>
+    <img id="productImage" width="200px" alt="商品圖片"/>
+    <p>商品名稱：<span id="productName"></span></p>
+    <p>分類：<span id="productCategory"></span></p>
+    <p>價格：<span id="productPrice"></span></p>
+    <p>存貨：<span id="productStock"></span></p>
+    <p>描述：<span id="productDescription"></span></p>
+
+    <script>
+        function fetchProductDetails() {
+            var productId = document.getElementById('productId').value;
+            if (!productId) {
+                alert('請輸入商品ID');
+                return;
+            }
+            
+            // API URL
+            var apiUrl = 'http://localhost:8081/products/' + productId;
+
+            // 使用fetch API獲取數據
+            fetch(apiUrl)
+                .then(response => {
+                    // 檢查是否成功獲取數據
+                    if (!response.ok) {
+                        throw new Error('未找到商品');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // 更新UI
+                    document.getElementById('productImage').src = data.imageUrl;
+                    document.getElementById('productName').innerText = data.productName;
+                    document.getElementById('productCategory').innerText = data.category;
+                    document.getElementById('productPrice').innerText = data.price;
+                    document.getElementById('productStock').innerText = data.stock;
+                    document.getElementById('productDescription').innerText = data.description;
+                })
+                .catch(error => {
+                    // 顯示錯誤信息
+                    alert(error.message);
+                });
+        }
+    </script>
+</body>
+</html>

@@ -1,12 +1,14 @@
 package com.eva.springboot_mall.model;
 
+import com.eva.springboot_mall.constant.ProductCategory;
+
 import java.util.Date;
 
 public class Product {
     private Integer productId;
     private String productName;
     private String imageUrl;
-    private String category;
+    private ProductCategory category;
     private Integer price;
     private Integer stock;
     private String description;
@@ -37,11 +39,11 @@ public class Product {
         this.imageUrl = imageUrl;
     }
 
-    public String getCategory() {
+    public ProductCategory getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(ProductCategory category) {
         this.category = category;
     }
 
