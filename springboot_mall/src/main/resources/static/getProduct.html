@@ -1,58 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Details</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
 </head>
-<body>
-    <h1>查詢商品</h1>
-    <label for="productId">商品ID：</label>
-    <input type="text" id="productId" placeholder="請輸入商品ID"/>
-    <button onclick="fetchProductDetails()">查詢</button>
 
-    <h2>商品詳情</h2>
-    <img id="productImage" width="200px" alt="商品圖片"/>
-    <p>商品名稱：<span id="productName"></span></p>
-    <p>分類：<span id="productCategory"></span></p>
-    <p>價格：<span id="productPrice"></span></p>
-    <p>存貨：<span id="productStock"></span></p>
-    <p>描述：<span id="productDescription"></span></p>
+<body class="container mt-5">
 
-    <script>
-        function fetchProductDetails() {
-            var productId = document.getElementById('productId').value;
-            if (!productId) {
-                alert('請輸入商品ID');
-                return;
-            }
-            
-            // API URL
-            var apiUrl = 'http://localhost:8081/products/' + productId;
+<h1 class="mb-4">查詢商品</h1>
 
-            // 使用fetch API獲取數據
-            fetch(apiUrl)
-                .then(response => {
-                    // 檢查是否成功獲取數據
-                    if (!response.ok) {
-                        throw new Error('未找到商品');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // 更新UI
-                    document.getElementById('productImage').src = data.imageUrl;
-                    document.getElementById('productName').innerText = data.productName;
-                    document.getElementById('productCategory').innerText = data.category;
-                    document.getElementById('productPrice').innerText = data.price;
-                    document.getElementById('productStock').innerText = data.stock;
-                    document.getElementById('productDescription').innerText = data.description;
-                })
-                .catch(error => {
-                    // 顯示錯誤信息
-                    alert(error.message);
-                });
+<div class="mb-3">
+    <label for="productId" class="form-label">商品ID：</label>
+    <div class="input-group">
+        <input type="text" class="form-control" id="productId" placeholder="請輸入商品ID">
+        <button class="btn btn-primary" onclick="fetchProductDetails()">查詢</button>
+    </div>
+</div>
+
+<h2 class="my-4">商品詳情</h2>
+<img id="productImage" class="mb-3" alt="商品圖片" style="width: 200px; height: 200px; object-fit: cover;">
+<p><strong>商品名稱：</strong><span id="productName"></span></p>
+<p><strong>分類：</strong><span id="productCategory"></span></p>
+<p><strong>價格：</strong><span id="productPrice"></span></p>
+<p><strong>存貨：</strong><span id="productStock"></span></p>
+<p><strong>描述：</strong><span id="productDescription"></span></p>
+<p><strong>建立時間：</strong><span id="productCreatedDate"></span></p>
+<p><strong>修改時間：</strong><span id="productLastModifiedDate"></span></p>
+
+<script>
+    function fetchProductDetails() {
+        var productId = document.getElementById('productId').value;
+        if (!productId) {
+            alert('請輸入商品ID');
+            return;
         }
-    </script>
+
+        // API URL
+        var apiUrl = 'http://localhost:8081/products/' + productId;
+
+        // 使用fetch API獲取數據
+        fetch(apiUrl)
+            .then(response => {
+                // 檢查是否成功獲取數據
+                if (!response.ok) {
+                    throw new Error('未找到商品');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // 更新UI
+                document.getElementById('productImage').src = data.imageUrl;
+                document.getElementById('productName').innerText = data.productName;
+                document.getElementById('productCategory').innerText = data.category;
+                document.getElementById('productPrice').innerText = data.price;
+                document.getElementById('productStock').innerText = data.stock;
+                document.getElementById('productDescription').innerText = data.description;
+                document.getElementById('productCreatedDate').innerText = data.createdDate;
+                document.getElementById('productLastModifiedDate').innerText = data.lastModifiedDate;
+            })
+            .catch(error => {
+                // 顯示錯誤信息
+                alert(error.message);
+            });
+    }
+</script>
+
+<script src="js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

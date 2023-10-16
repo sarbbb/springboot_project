@@ -1,0 +1,5 @@
+#productImage {
+    width: 100%;       /* 設定圖片的寬度為容器的100% */
+    height: 200px;     /* 設定一個固定的高度 */
+    object-fit: cover; /* 確保圖片均勻縮放，並裁剪超出的部分 */
+}

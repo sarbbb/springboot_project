@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Product</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/custom.css">
+</head>
+
+<body class="container mt-5">
+    <h2 class="mb-4">Add New Product</h2>
+
+    <form id="productForm">
+        <div class="mb-3">
+            <label for="productName" class="form-label">Product Name:</label>
+            <input type="text" class="form-control" id="productName" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="category" class="form-label">Category:</label>
+            <select class="form-select" id="category">
+                <option value="CAR">CAR</option>
+                <!-- Categories will be loaded dynamically -->
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="imageUrl" class="form-label">Image URL:</label>
+            <input type="url" class="form-control" id="imageUrl" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="price" class="form-label">Price:</label>
+            <input type="number" class="form-control" id="price" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="stock" class="form-label">Stock:</label>
+            <input type="number" class="form-control" id="stock" required>
+        </div>
+
+        <button type="button" class="btn btn-primary" onclick="submitProduct()">Submit</button>
+    </form>
+
+    <!-- New section to display the product -->
+    <div id="productDisplay" class="card mt-4" style="display: none;">
+        <img id="productImage" src="" alt="Product Image" class="card-img-top">
+        <div class="card-body">
+            <h5 class="card-title" id="productNameDisplay"></h5>
+            <p class="card-text">
+                <strong>Category:</strong> <span id="productCategory"></span><br>
+                <strong>Price:</strong> $<span id="productPrice"></span><br>
+                <strong>Stock:</strong> <span id="productStock"></span>
+            </p>
+        </div>
+    </div>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('http://localhost:8081/products/categories')
+                .then(response => response.json())
+                .then(categories => {
+                    const categorySelect = document.getElementById('category');
+                    categorySelect.innerHTML = categories.map(category =>
+                        `<option value="${category}">${category}</option>`
+                    ).join('');
+                });
+        });
+
+        function displayAddedProduct(data) {
+            document.getElementById('productImage').src = data.imageUrl;
+            document.getElementById('productNameDisplay').textContent = data.productName;
+            document.getElementById('productCategory').textContent = data.category;
+            document.getElementById('productPrice').textContent = data.price;
+            document.getElementById('productStock').textContent = data.stock;
+
+            // Show the product display section
+            document.getElementById('productDisplay').style.display = 'block';
+        }
+
+        function submitProduct() {
+
+            const productName = document.getElementById('productName').value;
+            const category = document.getElementById('category').value;
+            const imageUrl = document.getElementById('imageUrl').value;
+            const price = document.getElementById('price').value;
+            const stock = document.getElementById('stock').value;
+
+            // JS validation (Basic example)
+            if (!productName || !imageUrl || !price || !stock) {
+                alert("Please fill out all required fields.");
+                return;
+            }
+
+            // Constructing the payload to send to the backend
+            const productData = {
+                productName,
+                category,
+                imageUrl,
+                price: Number(price),
+                stock: Number(stock),
+                description: null // since description is optional
+            };
+
+            fetch('http://localhost:8081/products', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(productData)
+                })
+                .then(response => {
+                    // Check if the response is successful (status code 200-299)
+                    if (!response.ok) {
+                        throw new Error("Server responded with an error");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.productId) {
+                        displayAddedProduct(data);
+                    } else {
+                        alert('Failed to add product.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred.');
+                });
+        }
+    </script>
+
+    <!-- Optional Bootstrap JavaScript -->
+    <script src="js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
