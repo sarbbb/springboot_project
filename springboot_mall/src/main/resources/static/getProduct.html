@@ -20,15 +20,35 @@
     </div>
 </div>
 
-<h2 class="my-4">商品詳情</h2>
-<img id="productImage" class="mb-3" alt="商品圖片" style="width: 200px; height: 200px; object-fit: cover;">
-<p><strong>商品名稱：</strong><span id="productName"></span></p>
-<p><strong>分類：</strong><span id="productCategory"></span></p>
-<p><strong>價格：</strong><span id="productPrice"></span></p>
-<p><strong>存貨：</strong><span id="productStock"></span></p>
-<p><strong>描述：</strong><span id="productDescription"></span></p>
-<p><strong>建立時間：</strong><span id="productCreatedDate"></span></p>
-<p><strong>修改時間：</strong><span id="productLastModifiedDate"></span></p>
+<h2>商品詳情</h2>
+<img id="productImage" class="img-fluid mb-3" alt="商品圖片" style="max-width: 200px;">
+<h3>修改商品資料</h3>
+<form id="updateProductForm">
+    <div class="mb-3">
+        <label for="editProductName" class="form-label">商品名稱</label>
+        <input type="text" class="form-control" id="editProductName" required>
+    </div>
+    <div class="mb-3">
+        <label for="editCategory" class="form-label">分類</label>
+        <select class="form-control" id="editCategory" required>
+            <!-- JS會填充這裡的選項 -->
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="editImageUrl" class="form-label">商品圖片URL</label>
+        <input type="url" class="form-control" id="editImageUrl" required>
+    </div>
+    <div class="mb-3">
+        <label for="editPrice" class="form-label">價格</label>
+        <input type="number" class="form-control" id="editPrice" required>
+    </div>
+    <div class="mb-3">
+        <label for="editStock" class="form-label">存貨</label>
+        <input type="number" class="form-control" id="editStock" required>
+    </div>
+    <button type="submit" class="btn btn-primary">修改</button>
+</form>
+
 
 <script>
     function fetchProductDetails() {
@@ -66,6 +86,132 @@
                 alert(error.message);
             });
     }
+
+    document.getElementById('updateProductForm').addEventListener('submit', function(e) {
+        e.preventDefault();  // 阻止預設的表單提交行為
+
+        // 基本的驗證
+        var isValid = this.checkValidity();
+        if (!isValid) {
+            alert('請確認所有欄位都已正確填寫');
+            return;
+        }
+
+        // 從表單中獲取數據
+        var productData = {
+            productName: document.getElementById('editProductName').value,
+            category: document.getElementById('editCategory').value,
+            imageUrl: document.getElementById('editImageUrl').value,
+            price: parseFloat(document.getElementById('editPrice').value),
+            stock: parseInt(document.getElementById('editStock').value)
+        };
+
+        // 進行數據提交
+        fetch('/products/' + document.getElementById('productId').value, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(productData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                // 重新獲取產品資料來更新畫面
+                fetchProductDetails();
+            })
+            .catch(error => {
+                alert('修改失敗');
+            });
+    });
+
+    // 當頁面加載時，我們還希望能夠填充"分類"下拉菜單
+    fetch('/products/categories')
+        .then(response => response.json())
+        .then(data => {
+            var categorySelect = document.getElementById('editCategory');
+            data.forEach(category => {
+                var option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            });
+        });
+
+    function updateProductUI(data) {
+        // 更新UI
+        document.getElementById('productImage').src = data.imageUrl;
+
+        // 這裡設定更新商品資料的輸入欄位
+        document.getElementById('editProductName').value = data.productName;
+        document.getElementById('editCategory').value = data.category;
+        document.getElementById('editPrice').value = data.price;
+        document.getElementById('editStock').value = data.stock;
+        // 如果您還有其他元素要顯示商品資訊，可以在這裡添加
+    }
+
+    function fetchProductDetails() {
+        var productId = document.getElementById('productId').value;
+        if (!productId) {
+            alert('請輸入商品ID');
+            return;
+        }
+
+        var apiUrl = 'http://localhost:8081/products/' + productId;
+
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('未找到商品');
+                }
+                return response.json();
+            })
+            .then(data => {
+                updateProductUI(data);
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+    }
+
+    document.getElementById('updateProductForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        var isValid = this.checkValidity();
+        if (!isValid) {
+            alert('請確認所有欄位都已正確填寫');
+            return;
+        }
+
+        var productData = {
+            productName: document.getElementById('editProductName').value,
+            category: document.getElementById('editCategory').value,
+            imageUrl: document.getElementById('editImageUrl').value,
+            price: parseFloat(document.getElementById('editPrice').value),
+            stock: parseInt(document.getElementById('editStock').value)
+        };
+
+        fetch('/products/' + document.getElementById('productId').value, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(productData)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('修改失敗');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // 使用回應的數據更新UI
+                updateProductUI(data);
+                alert('商品已成功修改');
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+    });
 </script>
 
 <script src="js/bootstrap.bundle.min.js"></script>
