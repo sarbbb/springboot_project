@@ -3,3 +3,30 @@
     height: 200px;     /* 設定一個固定的高度 */
     object-fit: cover; /* 確保圖片均勻縮放，並裁剪超出的部分 */
 }
+/*.card {*/
+/*    height: 400px;*/
+/*    overflow: auto;*/
+/*}*/
+/* custom.css */
+.card-img-top {
+    height: 200px;  /* 或其他適合的高度 */
+    object-fit: cover;  /* 使圖片裁剪並填充整個容器 */
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;  /* 分配空間 */
+    height: 100%;  /* 使 card-body 撐開至整個 card 的高度 */
+}
+
+.truncate-description {
+    display: block;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;  /* 使超出的部分以 ... 顯示 */
+    max-width: 95%;  /* 限制描述的最大寬度 */
+}
+
+
