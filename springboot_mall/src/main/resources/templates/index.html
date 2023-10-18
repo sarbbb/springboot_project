@@ -9,6 +9,7 @@
   <!-- Bootstrap 5 CSS -->
   <link rel="stylesheet" href="css/bootstrap.min.css">
   <link rel="stylesheet" href="css/custom.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
 </head>
 <!-- 引入navbar -->
 
@@ -16,14 +17,28 @@
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 <div class="container mt-3">
   <div class="row mb-5">
-    <div class="col-md-6">
+    <div class="col-md-3">
       <input type="text" id="searchBox" class="form-control" placeholder="Search products...">
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
       <select id="categorySelect" class="form-control">
         <option value="">Select Category</option>
         <!-- Categories will be populated from the backend -->
       </select>
+    </div>
+    <div class="col-md-3">
+      <select id="orderBySelect" class="form-control">
+        <option value="created_date">Created Date</option>
+        <option value="product_name">Product Name</option>
+        <option value="price">Price</option>
+        <!-- 可以根據需要添加更多排序選項 -->
+      </select>
+    </div>
+    <div class="col-md-1">
+      <div class="btn-group" role="group" aria-label="Sort Order">
+        <button type="button" class="btn btn-secondary sort-btn" id="sortAscBtn" data-sort="asc"><i class="fas fa-arrow-up"></i></button>
+        <button type="button" class="btn btn-secondary sort-btn active" id="sortDescBtn" data-sort="desc"><i class="fas fa-arrow-down"></i></button>
+      </div>
     </div>
     <div class="col-md-2">
       <button id="searchButton" class="btn btn-primary">Search</button>

@@ -19,17 +19,23 @@ window.onload = () => {
     fetchProducts();
 };
 
+
 function fetchProducts() {
     const searchValue = document.getElementById('searchBox').value;
     const categoryValue = document.getElementById('categorySelect').value;
+    const orderByValue = document.getElementById('orderBySelect').value;
+    const sortAscButton = document.getElementById('sortAscBtn');
+    const sortValue = sortAscButton.classList.contains('active') ? 'asc' : 'desc';
 
     let url = 'http://localhost:8081/products?';
     if (searchValue) {
         url += 'search=' + encodeURIComponent(searchValue) + '&';
     }
     if (categoryValue) {
-        url += 'category=' + encodeURIComponent(categoryValue);
+        url += 'category=' + encodeURIComponent(categoryValue) + '&';
     }
+    url += 'orderBy=' + encodeURIComponent(orderByValue) + '&';
+    url += 'sort=' + encodeURIComponent(sortValue);
 
     fetch(url)
         .then(response => response.json())
@@ -38,36 +44,78 @@ function fetchProducts() {
             productsRow.innerHTML = '';  // Clear previous products
 
             data.forEach(product => {
-                if (product.productName && product.imageUrl && product.category && product.price) {
-                    const card = `
-                <div class="col-md-4">
-                    <a href="product-details?id=${product.productId}" class="text-decoration-none text-dark">
-                        <div class="card mb-4  d-flex flex-column" style="margin-top: 20px; margin-bottom: 20px;">
-                            <img src="${product.imageUrl}" class="card-img-top img-fluid" alt="${product.productName}">
-                            <div class="card-body d-flex flex-column justify-content-between">
-                                <div>
-                                    <h5 class="card-title mb-auto">${product.productName}</h5>
-                                    <p class="card-text truncate-description">${product.description || ''}</p>
-                                </div>
-                                <div>
-                                    <p class="card-text"><strong>Category:</strong> ${product.category}</p>
-                                    <p class="card-text"><strong>Price:</strong> $${product.price}</p>
-                                    <p class="card-text"><small class="text-muted">Last updated ${product.lastModifiedDate}</small></p>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                `;
-                    productsRow.innerHTML += card;
-                }
+                let colElem = document.createElement("div");
+                colElem.className = "col-md-4";  // Create a column div
+
+                let cardElem = document.createElement("div");
+                cardElem.className = "card mb-4 d-flex flex-column";  // Added styles from your template
+
+                let imgElem = document.createElement("img");
+                imgElem.className = "card-img-top";
+                imgElem.src = product.imageUrl;
+                imgElem.alt = "Product Image";
+
+                let cardBodyElem = document.createElement("div");
+                cardBodyElem.className = "card-body d-flex flex-column justify-content-between";  // Added styles
+
+                let cardTitleElem = document.createElement("h5");
+                cardTitleElem.className = "card-title mb-auto";
+                cardTitleElem.textContent = product.productName;
+
+                let cardDescriptionElem = document.createElement("p");
+                cardDescriptionElem.className = "card-text truncate-description";
+                cardDescriptionElem.textContent = product.description || '';
+
+                let cardCategoryElem = document.createElement("p");
+                cardCategoryElem.className = "card-text";
+                let strongElem = document.createElement("strong");
+                strongElem.textContent = "Category:";
+                cardCategoryElem.appendChild(strongElem);
+                let textNode = document.createTextNode(" " + product.category);
+                cardCategoryElem.appendChild(textNode);
+
+                let cardPriceElem = document.createElement("p");
+                cardPriceElem.className = "card-text";
+                cardPriceElem.innerHTML = "<strong>Price:</strong> $" + product.price;
+
+                let cardUpdatedElem = document.createElement("p");
+                cardUpdatedElem.className = "card-text";
+                cardUpdatedElem.innerHTML = `<small class="text-muted">Last updated ${product.lastModifiedDate}</small>`;
+
+                cardBodyElem.appendChild(cardTitleElem);
+                cardBodyElem.appendChild(cardDescriptionElem);
+                cardBodyElem.appendChild(cardCategoryElem);
+                cardBodyElem.appendChild(cardPriceElem);
+                cardBodyElem.appendChild(cardUpdatedElem);
+
+                cardElem.appendChild(imgElem);
+                cardElem.appendChild(cardBodyElem);
+
+                let linkElem = document.createElement("a");
+                linkElem.href = "product-details?id=" + product.productId;
+                linkElem.className = "text-decoration-none text-dark";
+                linkElem.appendChild(cardElem);
+
+                colElem.appendChild(linkElem);
+                productsRow.appendChild(colElem);
             });
         })
         .catch(error => {
             console.error('Error fetching products:', error);
         });
+
 }
+
+const sortButtons = document.querySelectorAll('.sort-btn');
+sortButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+        sortButtons.forEach(innerBtn => innerBtn.classList.remove('active'));
+        this.classList.add('active');
+        fetchProducts(); // Refetch the products with the new sort order
+    });
+});
 
 // Add event listener for the search button
 document.getElementById('searchButton').addEventListener('click', fetchProducts);
+document.getElementById('orderBySelect').addEventListener('change', fetchProducts);
 

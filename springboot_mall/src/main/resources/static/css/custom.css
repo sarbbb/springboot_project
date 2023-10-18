@@ -28,5 +28,19 @@
     text-overflow: ellipsis;  /* 使超出的部分以 ... 顯示 */
     max-width: 95%;  /* 限制描述的最大寬度 */
 }
+.btn.sort-btn {
+    background-color: #007bff !important;
+    border-color: #007bff !important;
+}
+
+.btn.sort-btn:hover {
+    background-color: #0056b3 !important;
+}
+
+.btn.sort-btn.active {
+    background-color: #0056b3 !important;
+    border-color: #0056b3 !important;
+}
+
 
 
