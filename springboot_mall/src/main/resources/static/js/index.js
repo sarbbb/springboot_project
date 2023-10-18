@@ -20,7 +20,10 @@ window.onload = () => {
 };
 
 
-function fetchProducts() {
+let currentPage = 1;
+const productsPerPage = 10;
+function fetchProducts(page = 1) {
+    currentPage = page;
     const searchValue = document.getElementById('searchBox').value;
     const categoryValue = document.getElementById('categorySelect').value;
     const orderByValue = document.getElementById('orderBySelect').value;
@@ -28,6 +31,7 @@ function fetchProducts() {
     const sortValue = sortAscButton.classList.contains('active') ? 'asc' : 'desc';
 
     let url = 'http://localhost:8081/products?';
+
     if (searchValue) {
         url += 'search=' + encodeURIComponent(searchValue) + '&';
     }
@@ -35,15 +39,19 @@ function fetchProducts() {
         url += 'category=' + encodeURIComponent(categoryValue) + '&';
     }
     url += 'orderBy=' + encodeURIComponent(orderByValue) + '&';
-    url += 'sort=' + encodeURIComponent(sortValue);
+    url += 'sort=' + encodeURIComponent(sortValue) + '&';
+
+    url += 'limit=' + encodeURIComponent(productsPerPage) + '&';
+    url += 'offset=' + encodeURIComponent((currentPage - 1) * productsPerPage);
 
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            const productsRow = document.getElementById('productsRow');
-            productsRow.innerHTML = '';  // Clear previous products
+                const productsRow = document.getElementById('productsRow');
+                productsRow.innerHTML = '';  // Clear previous products
 
-            data.forEach(product => {
+                data.results.forEach(product => {
+
                 let colElem = document.createElement("div");
                 colElem.className = "col-md-4";  // Create a column div
 
@@ -99,11 +107,35 @@ function fetchProducts() {
                 colElem.appendChild(linkElem);
                 productsRow.appendChild(colElem);
             });
+            renderPagination(data.total, productsPerPage);
         })
         .catch(error => {
             console.error('Error fetching products:', error);
         });
 
+}
+
+function renderPagination(totalProducts, productsPerPage) {
+    const totalPages = Math.ceil(totalProducts / productsPerPage);
+    const paginationElement = document.getElementById('pagination');
+    paginationElement.innerHTML = '';
+
+    for (let i = 1; i <= totalPages; i++) {
+        const li = document.createElement('li');
+        li.className = i === currentPage ? 'page-item active' : 'page-item';
+
+        const a = document.createElement('a');
+        a.href = '#';
+        a.className = 'page-link';
+        a.textContent = i;
+        a.addEventListener('click', function(e) {
+            e.preventDefault();
+            fetchProducts(i);
+        });
+
+        li.appendChild(a);
+        paginationElement.appendChild(li);
+    }
 }
 
 const sortButtons = document.querySelectorAll('.sort-btn');

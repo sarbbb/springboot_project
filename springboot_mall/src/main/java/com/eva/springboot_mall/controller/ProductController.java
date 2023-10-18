@@ -36,7 +36,7 @@ public class ProductController {
 
              //分頁 Pagination
             @RequestParam(defaultValue = "5") @Max(1000) @Min(0) Integer limit,
-            @RequestParam(defaultValue = "5") @Min(0) Integer offset
+            @RequestParam(defaultValue = "0") @Min(0) Integer offset
     ){
         ProductQueryParams productQueryParams = new ProductQueryParams();
         productQueryParams.setCategory(category);
@@ -46,11 +46,17 @@ public class ProductController {
         productQueryParams.setLimit(limit);
         productQueryParams.setOffset(offset);
 
+        // 取得 product list
         List<Product> productList= productService.getProducts(productQueryParams);
+
+        // 取得 product 總數
+        Integer total = productService.countProduct(productQueryParams);
+
+        // 分頁
         Page<Product> page = new Page<>();
         page.setLimit(limit);
         page.setOffset(offset);
-        page.setTotal(null);
+        page.setTotal(total);
         page.setResults(productList);
         return ResponseEntity.status(HttpStatus.OK).body(page);
     }
