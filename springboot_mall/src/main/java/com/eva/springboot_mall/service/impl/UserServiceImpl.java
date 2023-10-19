@@ -1,6 +1,7 @@
 package com.eva.springboot_mall.service.impl;
 
 import com.eva.springboot_mall.dao.UserDao;
+import com.eva.springboot_mall.dto.UserLoginRequest;
 import com.eva.springboot_mall.dto.UserRegisterRequest;
 import com.eva.springboot_mall.model.User;
 import com.eva.springboot_mall.service.UserService;
@@ -30,11 +31,30 @@ public class UserServiceImpl implements UserService {
         User user = userDao.getUserByEmail(userRegisterRequest.getEmail());
 
         if(user!=null){
-            log.warn("該email：{}已經被註冊", userRegisterRequest.getEmail());
+            log.warn("該email：{} 已經被註冊", userRegisterRequest.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
         // 創建帳號
         return userDao.createUser(userRegisterRequest);
+    }
+
+    @Override
+    public User login(UserLoginRequest userLoginRequest) {
+        User user = userDao.getUserByEmail(userLoginRequest.getEmail());
+
+        if(user == null)
+        {
+            log.warn("該email:{} 尚未註冊",userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        if(user.getPassword().equals(userLoginRequest.getPassword())){
+            return user;
+        } else{
+            log.warn("email:{} 的密碼不正確", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
     }
 }
