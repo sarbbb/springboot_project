@@ -19,6 +19,17 @@ window.onload = () => {
     fetchProducts();
 };
 
+let loginModalElement = document.getElementById('loginModal');
+let loginModal = new bootstrap.Modal(loginModalElement);
+
+document.getElementById('loginButton').addEventListener('click', function() {
+    loginModal.show();
+});
+
+document.getElementById('closeModalButton').addEventListener('click', function() {
+    loginModal.hide();
+});
+
 
 let currentPage = 1;
 const productsPerPage = 10;
@@ -137,6 +148,40 @@ function renderPagination(totalProducts, productsPerPage) {
         paginationElement.appendChild(li);
     }
 }
+
+document.getElementById('submitLogin').addEventListener('click', function() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    const userLoginRequest = {
+        email: email,
+        password: password
+    };
+
+    fetch('http://localhost:8081/users/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(userLoginRequest)
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.userId) {
+                var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                loginModal.hide();
+
+                // Login successful, you can redirect or do something here
+            } else {
+                // Handle login error here
+                alert('登入失敗！');
+            }
+        })
+        .catch(error => {
+            console.error('Error during login:', error);
+        });
+});
+
 
 const sortButtons = document.querySelectorAll('.sort-btn');
 sortButtons.forEach(btn => {
